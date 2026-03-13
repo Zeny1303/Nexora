@@ -1,4 +1,4 @@
-# 🎓 CampusConnect
+# 🎓 Nexora
 
 > **Discover Every Event Around You** — A full-stack platform that connects students with college events, fests, hackathons, and clubs across India.
 
