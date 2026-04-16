@@ -2,7 +2,7 @@
 
 <img src="ui/banner.png" alt="Campus Connect — Discover Every Event Around You" width="100%" />
 
-# Campus Connect
+# Nexora
 
 **The campus events platform for Indian college students.**
 
