@@ -17,7 +17,7 @@ Discover hackathons, tech fests, cultural nights, workshops, and every campus ev
 [![Clerk](https://img.shields.io/badge/Auth-Clerk-6c47ff?style=flat-square)](https://clerk.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-[Live Demo](#) · [Report Bug](https://github.com/Zeny1303/campus-connect/issues) · [Request Feature](https://github.com/Zeny1303/campus-connect/issues)
+[Live Demo](https://nexora-v2-taupe.vercel.app/) · [Report Bug](https://github.com/Zeny1303/campus-connect/issues) · [Request Feature](https://github.com/Zeny1303/campus-connect/issues)
 
 </div>
 
