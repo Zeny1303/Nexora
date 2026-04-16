@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="ui/banner.png" alt="Campus Connect — Discover Every Event Around You" width="100%" />
+<img src="ui/ui/Screenshot 2026-04-16 132608.png" alt="Campus Connect — Discover Every Event Around You" width="100%" />
 
 # Nexora
 
