@@ -1,225 +1,254 @@
-# 🎓 Nexora
+<div align="center">
 
-> **Discover Every Event Around You** — A full-stack platform that connects students with college events, fests, hackathons, and clubs across India.
+<img src="ui/banner.png" alt="Campus Connect — Discover Every Event Around You" width="100%" />
+
+# Campus Connect
+
+**The campus events platform for Indian college students.**
+
+Discover hackathons, tech fests, cultural nights, workshops, and every campus event — all in one place.
+
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
+[![Django](https://img.shields.io/badge/Django-4.2-092E20?style=flat-square&logo=django&logoColor=white)](https://djangoproject.com/)
+[![DRF](https://img.shields.io/badge/DRF-3.15-red?style=flat-square)](https://www.django-rest-framework.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
+[![Mapbox](https://img.shields.io/badge/Mapbox-GL-000000?style=flat-square&logo=mapbox&logoColor=white)](https://mapbox.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Clerk](https://img.shields.io/badge/Auth-Clerk-6c47ff?style=flat-square)](https://clerk.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+
+[Live Demo](#) · [Report Bug](https://github.com/Zeny1303/campus-connect/issues) · [Request Feature](https://github.com/Zeny1303/campus-connect/issues)
+
+</div>
 
 ---
 
-## 📌 Overview
+## Table of Contents
 
-CampusConnect is a role-based event discovery and management platform built for the Indian college ecosystem. Students can browse and register for campus events, organizers can publish and manage their events, and admins maintain platform integrity through a verification and approval pipeline.
-
----
-
-## ✨ Key Features
-
-- **Multi-Role Authentication** — Separate flows for Students, Organizers, and Admins with JWT-based sessions
-- **OTP Email Verification** — College email domain validation (`.ac.in` / `.edu`) for students
-- **Organizer Verification** — LinkedIn-style verification flow with admin approval and badge system
-- **Event Discovery** — Filter events by city, type, date, and status in both Grid and Map views
-- **Interactive Map** — Leaflet.js-powered map with category-colored pin markers and event popups
-- **Real-Time Notifications** — WebSocket-based live updates via Django Channels and Redis
-- **Event Registration** — Duplicate-prevention, confirmation emails, and CSV participant export
-- **Admin Panel** — Full control over organizer verifications, event approvals, and platform statistics
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [Author](#author)
 
 ---
 
-## 🛠️ Tech Stack
+## Overview
+
+Campus Connect solves a real problem: campus events are scattered across Instagram DMs, WhatsApp groups, and college notice boards. Campus Connect centralizes everything — students can discover events near them on a live 3D map, organizers can list and manage events, and admins oversee the platform through an approval pipeline.
+
+Built on a **decoupled React + Django architecture** — a Vite-powered React frontend communicates with a Django REST Framework backend over HTTP, with Clerk handling all authentication.
+
+---
+
+## Features
+
+### For Students
+- **Discover Events** — Browse all campus events with category, city, and date filters
+- **Interactive 3D Map** — Events plotted on a live Mapbox map pinned to their exact campus location
+- **Turn-by-Turn Routing** — Get driving directions to any event directly on the map
+- **College Hub** — Browse events grouped by college, sorted by activity
+- **Event Registration** — Register for events with duplicate-prevention
+
+### For Organizers
+- **Event Publishing** — Multi-section form (Basic Info, Date & Location, Details, Media)
+- **Participant Management** — Searchable, paginated participant list with CSV export
+
+### For Admins
+- **Approval Pipeline** — Approve or reject organizer verifications and event submissions
+- **Account Control** — Soft-delete organizers or events
+
+### Platform
+- **Authentication** — Clerk-powered sign-in / sign-up with Google OAuth support
+- **Role-Based Access** — Separate flows and permissions for Students, Organizers, and Admins
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React, Tailwind CSS, Framer Motion, Leaflet.js |
-| **UI Generation** | v0.dev |
-| **Backend** | Django, Django REST Framework (DRF) |
-| **Database** | PostgreSQL |
-| **Real-Time** | Django Channels, WebSockets, Redis Channel Layer |
-| **Task Queue** | Celery + Redis |
-| **Email** | SendGrid |
-| **Auth** | JWT (`djangorestframework-simplejwt`) |
-| **Media Storage** | AWS S3 |
-| **Filtering** | `django-filter` |
-| **Server** | Uvicorn / Gunicorn |
+| Frontend | React 19, Vite 7 |
+| Styling | Tailwind CSS 4 |
+| Routing | React Router DOM v7 |
+| Maps | Mapbox GL JS 3, react-map-gl 8 |
+| Map Fallback | Leaflet.js 1.9, react-leaflet 5 |
+| Carousel | Swiper 12 |
+| Icons | Lucide React |
+| Auth | Clerk |
+| Backend | Django 4.2, Django REST Framework 3.15 |
+| Filtering | django-filter |
+| Database | MongoDB Atlas |
 
 ---
 
-## 🏗️ Backend Architecture — Django + DRF
+## Architecture
 
-The backend is organized into 7 independent Django apps (modules). Each module is built and tested independently.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Browser (Client)                         │
+│                                                                 │
+│   React 19 + Vite  ──  Tailwind CSS  ──  Mapbox GL JS          │
+│   React Router v7  ──  Swiper  ──  Lucide Icons                │
+└────────────────────────────┬────────────────────────────────────┘
+                             │  HTTP (REST)
+┌────────────────────────────▼────────────────────────────────────┐
+│                      Django Backend (WSGI)                      │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │  accounts    │  │   events     │  │    registrations     │  │
+│  │  user roles  │  │  CRUD + map  │  │  signup + CSV export │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+              ┌────────────────▼────────────────┐
+              │         MongoDB Atlas            │
+              │         (primary database)       │
+              └─────────────────────────────────┘
 
-### 🔐 Module 1 — Authentication
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Custom User model with `role` field (student / organizer / admin) and `is_verified` flag | `AbstractBaseUser`, `PermissionsMixin` |
-| 2 | Student registration with college email OTP verification (`.ac.in` / `.edu` domain check) | `DRF APIView`, Django cache, Celery |
-| 3 | Organizer registration with OTP (no domain restriction) | `DRF APIView`, Django cache, Celery |
-| 4 | JWT login / logout / token refresh — shared endpoint, role returned in response | `djangorestframework-simplejwt` |
-| 5 | Auth middleware — route protection by role (`IsStudent`, `IsOrganizer`, `IsAdmin`, `IsVerifiedOrganizer`) | Custom DRF Permission classes |
-
-### ✅ Module 2 — Organizer Verification
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Organizer submits verification form: org name, type, website, description, logo, socials | `DRF ModelSerializer`, `FileField`, `OrgVerification` model |
-| 2 | Unverified organizers can browse but cannot publish events (returns `403`) | `IsVerifiedOrganizer` permission class |
-| 3 | Admin reviews, approves, or rejects submissions with a reason note | Django Admin custom actions |
-| 4 | On approval: `is_verified = True`, Verified ✓ badge granted, email sent | Django signal → Celery → SendGrid |
-| 5 | On rejection: reason emailed, resubmission allowed after 24 hours | Celery task, cooldown via `submitted_at` |
-
-### 🎯 Module 3 — Event Management
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Event creation API: title, type, date, city, coordinates, poster, registration link, team size | `DRF ModelSerializer`, `ImageField`, `PointField` |
-| 2 | Admin event approval — approve or reject with one click | Django Admin + DRF `PATCH` endpoint |
-| 3 | Auto email to organizer on event going live | Celery task |
-| 4 | Event listing API with filters: city, type, date range, status | `django-filter`, `DRF ListAPIView` |
-| 5 | Event detail API — full event info | `DRF RetrieveAPIView` |
-| 6 | Organizer can edit or cancel their own events | `DRF UpdateAPIView`, `IsOwner` permission |
-
-### 🎓 Module 4 — Student Registration
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Student registers for an event — stores name, email, college, year, branch | `DRF CreateAPIView`, ManyToMany (Student ↔ Event) |
-| 2 | Duplicate registration prevention | `unique_together` constraint + DRF validation |
-| 3 | Confirmation email on registration | Celery + email template |
-| 4 | "My Events" API — all events the student has registered for | `DRF ListAPIView` |
-| 5 | Organizer views participant list — name, email, college, year, branch | `DRF ListAPIView` with `IsOrganizer` permission |
-| 6 | Export participant list as CSV download | `Django StreamingHttpResponse` |
-
-### 🗺️ Module 5 — Map API
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Geo data stored per event: city, lat/lng, category | Django model with `FloatField` |
-| 2 | Map events API — returns all live events with coordinates, category, title, date (public, no auth) | `DRF ListAPIView` |
-| 3 | Filter map events by city, type, and date range | `django-filter` |
-
-### 🔔 Module 6 — Notifications
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Organizer posts event update (schedule change, results, announcements) | `DRF CreateAPIView`, `EventUpdate` model |
-| 2 | Followed students receive real-time notification via WebSocket | Django Channels, Redis Channel Layer |
-| 3 | Student follow / unfollow an event | ManyToMany Follow model, DRF toggle endpoint |
-
-### 🛡️ Module 7 — Admin Panel
-| Step | Description | Tools |
-|---|---|---|
-| 1 | Admin views all pending organizers and events with approve/reject controls | Django Admin with custom `list_display` and actions |
-| 2 | Platform stats: total events, students, registrations by category | Django ORM aggregation, DRF stats endpoint |
-| 3 | Admin can deactivate an organizer or remove an event | Soft delete with `is_active` flag |
+  Auth handled separately by Clerk (JWT + OAuth)
+```
 
 ---
 
-## 🎨 Frontend Architecture — React + Tailwind
+## Project Structure
 
-The UI is generated using [v0.dev](https://v0.dev) prompts and enhanced with Framer Motion animations.
-
-**Role Legend:** ⬜ Public · 🔵 Student · 🟠 Organizer · 🟣 Admin
-
-| Page | Role | Description |
-|---|---|---|
-| **Landing Page** | ⬜ Public | Hero section, feature cards, stats bar, footer. Deep blue + white color scheme. |
-| **Event Discovery + Map** | ⬜ / 🔵 | Tabbed Grid View and Map View with shared filter state (city, type, date, status). |
-| **Event Detail** | ⬜ / 🔵 | Poster, organizer card with Verified ✓ badge, countdown timer, follow button, sidebar. |
-| **Student Auth** | ⬜ Public | Sign up with OTP flow and college email validation. Split-panel layout. |
-| **Organizer Auth** | ⬜ Public | Sign up → OTP → "Get Verified Now" prompt. Indigo/violet accent to differentiate. |
-| **Organizer Verification** | 🟠 Organizer | LinkedIn-style multi-section form with progress bar and profile preview card. |
-| **Event Create / Publish** | 🟠 Organizer | Multi-section form (Basic Info, Date & Location, Details, Media) with sticky section nav. |
-| **Organizer Dashboard** | 🟠 Organizer | Events table with status badges, participant counts, verification banner, and stat cards. |
-| **Participants List** | 🟠 Organizer | Searchable, paginated table with "Export CSV" button. Notion/Airtable aesthetic. |
-| **Student Dashboard** | 🔵 Student | Discover, My Events (Registered / Following tabs), notification bell, update feed. |
-| **Admin Panel** | 🟣 Admin | Stats overview, pending verifications table, pending events table, approve/reject modals. |
+```
+campus-connect/
+│
+├── my-app/                          # React frontend (Vite)
+│   └── src/
+│       ├── assets/                  # Images, video, icons
+│       ├── components/
+│       │   ├── MapView.jsx          # Mapbox 3D map — markers, routing, popups
+│       │   ├── EventCarousel.jsx    # Bottom event strip with hover sync
+│       │   ├── SidebarFilters.jsx   # Category filter sidebar
+│       │   ├── SearchBar.jsx        # Location search with geocoding
+│       │   ├── EventMarker.jsx      # Custom map pin component
+│       │   └── EventPopup.jsx       # Map popup card
+│       ├── data/
+│       │   └── event.js             # Event seed data + category color map
+│       └── pages/
+│           ├── landingpage.jsx      # Hero, college showcase, footer
+│           ├── authpage.jsx         # Clerk-powered auth flow
+│           ├── EventDiscovery.jsx   # Map + carousel + filters
+│           ├── EventDetails.jsx     # Full event detail page
+│           └── EventMapPage.jsx     # Standalone map view
+│
+├── server/                          # Django backend
+│   ├── accounts/                    # User model, roles
+│   ├── events/                      # Event CRUD, approval pipeline, geo data
+│   ├── registrations/               # Student registration, participant list, CSV
+│   ├── campus_connect/              # Django project settings & root URLs
+│   ├── manage.py
+│   └── requirements.txt
+│
+└── ui/                              # Design screenshots & mockups
+```
 
 ---
 
-## 👤 User Roles
-
-| Role | Capabilities |
-|---|---|
-| **Student** | Browse events, register for events, follow events, receive real-time updates |
-| **Organizer (Unverified)** | Browse events; cannot publish until verified |
-| **Organizer (Verified)** | Publish events, view participants, export CSVs, post updates |
-| **Admin** | Approve/reject organizers and events, view platform stats, deactivate accounts |
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.11+
 - Node.js 18+
-- PostgreSQL
-- Redis
+- MongoDB Atlas account (or local MongoDB)
 
 ### Backend Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/campusconnect.git
-cd campusconnect/backend
+# 1. Clone the repository
+git clone https://github.com/Zeny1303/campus-connect.git
+cd campus-connect/server
 
-# Create virtual environment and install dependencies
+# 2. Create and activate a virtual environment
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# Configure environment variables
-cp .env.example .env
-# Edit .env with your DATABASE_URL, REDIS_URL, SENDGRID_API_KEY, AWS credentials, etc.
-
-# Run migrations
+# 4. Run migrations
 python manage.py migrate
 
-# Create superuser (admin)
+# 5. Create a superuser
 python manage.py createsuperuser
 
-# Start Celery worker
-celery -A campusconnect worker --loglevel=info
-
-# Start development server
+# 6. Start the development server
 python manage.py runserver
 ```
 
 ### Frontend Setup
 
 ```bash
-cd campusconnect/frontend
+cd campus-connect/my-app
 
 # Install dependencies
 npm install
 
-# Start development server
+# Start the dev server
 npm run dev
 ```
 
----
-
-## 📁 Project Structure
-
-```
-campusconnect/
-├── backend/
-│   ├── authentication/     # Module 1 — User auth, JWT, OTP
-│   ├── verification/       # Module 2 — Organizer verification
-│   ├── events/             # Module 3 — Event CRUD and approval
-│   ├── registrations/      # Module 4 — Student event registration
-│   ├── map_api/            # Module 5 — Geo data and map endpoint
-│   ├── notifications/      # Module 6 — WebSocket updates and follow system
-│   ├── admin_panel/        # Module 7 — Admin actions and stats
-│   └── campusconnect/      # Django project settings
-└── frontend/
-    ├── src/
-    │   ├── pages/          # One folder per page (Landing, Discovery, Detail, etc.)
-    │   ├── components/     # Shared UI components
-    │   └── hooks/          # Custom React hooks (useWebSocket, useAuth, etc.)
-    └── public/
-```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 📄 License
+## API Reference
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+### Events
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/events/` | List approved events (filterable) | Public |
+| `GET` | `/api/events/map/` | Events with geo data for map pins | Public |
+| `GET` | `/api/events/:id/` | Event detail | Public |
+| `POST` | `/api/events/` | Create event | Organizer |
+| `PATCH` | `/api/events/:id/` | Edit event | Owner |
+| `DELETE` | `/api/events/:id/` | Soft-delete event | Owner / Admin |
+
+### Registrations
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/registrations/` | Register for an event | Student |
+| `GET` | `/api/registrations/my-events/` | Student's registered events | Student |
+| `GET` | `/api/registrations/:eventId/participants/` | Participant list | Organizer |
+| `GET` | `/api/registrations/:eventId/export/` | Download participants as CSV | Organizer |
+
+---
+
+## Contributing
+
+Contributions are welcome. To contribute:
+
+1. Fork the repository
+2. Create a feature branch — `git checkout -b feature/your-feature`
+3. Commit your changes — `git commit -m 'feat: add your feature'`
+4. Push to the branch — `git push origin feature/your-feature`
+5. Open a Pull Request
+
+Please keep PRs focused on a single concern and follow the existing code style.
+
+---
+
+## Author
+
+**Sneha Kashyap**
+Designer & Developer
+
+- GitHub: [@Zeny1303](https://github.com/Zeny1303)
+- LinkedIn: [sneha1309]([https://www.linkedin.com/in/sneha1309/])
+- Email: [snehakashyap9920@gmail.com](mailto:snehakashyap9920@gmail.com)
 
 ---
 
 <div align="center">
-  Built with ❤️ for the Indian campus community
+  © 2025 Campus Connect. Designed & built by Sneha Kashyap.
 </div>
